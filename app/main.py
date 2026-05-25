@@ -24,6 +24,9 @@ def main():
             if user_input_split[1] in VALID_COMMANDS:
                 print(f"{user_input_split[1]} is a shell builtin")
                 continue
+            else:
+                print(f"{user_input_split[1]}: command not found")
+                continue
         # handle unknown command
         print(f"{user_input}: command not found")
 
