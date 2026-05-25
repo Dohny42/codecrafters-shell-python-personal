@@ -25,7 +25,7 @@ def main():
                 print(f"{user_input_split[1]} is a shell builtin")
                 continue
             else:
-                print(f"{user_input_split[1]}: command not found")
+                print(f"{user_input_split[1]}: not found")
                 continue
         # handle unknown command
         print(f"{user_input}: command not found")
