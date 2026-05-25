@@ -11,7 +11,9 @@ def handle_echo(args: str):
 
 def check_executable_exists(command: str) -> tuple[bool, str]:
     for path in sys.path:
-        executable_path = f"{path}/{command}"
+        print(f"checking {path=}")
+        executable_path = os.path.join(path, command)
+        print(f"Checking {executable_path=}")
         if os.path.isfile(executable_path) and os.access(executable_path, os.X_OK):
             return True, executable_path
         else:
