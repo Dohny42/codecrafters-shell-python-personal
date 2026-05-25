@@ -5,8 +5,18 @@ def main():
     while True:
         sys.stdout.write("$ ")
         user_input = input()
+        # handle exit
         if user_input == "exit":
             break
+        # handle echo, first split
+        user_input_split = user_input.split(" ", maxsplit=1)
+        if user_input_split[0] == "echo":
+            if len(user_input_split) > 1:
+                print(user_input_split[1])
+            else:
+                print()
+            continue
+        # handle unknown command
         print(f"{user_input}: command not found")
 
 
