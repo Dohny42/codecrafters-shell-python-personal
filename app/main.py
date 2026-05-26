@@ -32,7 +32,7 @@ def handle_type(args: list[str]):
         return
     exe_exist, full_path = check_executable_exists(args[0])
     if exe_exist:
-        subprocess.run([full_path] + args[1:], check=True)
+        print(f"{args[0]} is {full_path}")
     else:
         print(f"{args[0]}: not found")
 
@@ -44,11 +44,20 @@ def main():
     while True:
         sys.stdout.write("$ ")
         command = input()
+
         # handle exit
         if command == "exit":
             break
-        # handle builtins
+
         command_split = command.split(" ")
+
+        # handle executable
+        exe_exist, full_path = check_executable_exists(command_split[0])
+        if exe_exist:
+            subprocess.run([full_path] + command_split[1:], check=True)
+            continue
+
+        # handle builtins
         if command_split[0] in BUILTIN_COMMANDS:
             handler = BUILTIN_COMMANDS[command_split[0]]
             handler(command_split[1:])
