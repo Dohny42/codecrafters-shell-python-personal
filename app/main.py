@@ -27,6 +27,7 @@ def handle_type(args: str):
     # currently will not handle multiple args or missing args, just assume the good case
     if args in BUILTIN_COMMAND_HANDLER_MAP or args == "exit":
         print(f"{args} is a shell builtin")
+        return
     exe_exist, full_path = check_executable_exists(args)
     if exe_exist:
         print(f"{args} is {full_path}")
