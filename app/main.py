@@ -2,11 +2,12 @@ import os
 import sys
 
 
-def handle_echo(args: str):
-    if len(args) > 1:
-        print(args[1])
-    else:
+def handle_echo(args: str | None):
+    # empty raw string from cmd would be None, which should be ok to print newline
+    if args is None:
         print()
+    else:
+        print(args)
 
 
 def check_executable_exists(command: str) -> tuple[bool, str]:
