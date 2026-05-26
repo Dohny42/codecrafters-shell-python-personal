@@ -1,8 +1,9 @@
 import os
+import subprocess
 import sys
 
 
-def handle_echo(args: str | None):
+def handle_echo(args: list[str] | None):
     # empty raw string from cmd would be None, which should be ok to print newline
     if args is None:
         print()
@@ -24,37 +25,37 @@ def check_executable_exists(command: str) -> tuple[bool, str]:
     return False, ""
 
 
-def handle_type(args: str):
+def handle_type(args: list[str]):
     # currently will not handle multiple args or missing args, just assume the good case
-    if args in BUILTIN_COMMAND_HANDLER_MAP or args == "exit":
+    if args in BUILTIN_COMMANDS or args == "exit":
         print(f"{args} is a shell builtin")
         return
-    exe_exist, full_path = check_executable_exists(args)
+    exe_exist, full_path = check_executable_exists(args[0])
     if exe_exist:
-        print(f"{args} is {full_path}")
+        subprocess.run([full_path] + args[1:], check=True)
     else:
-        print(f"{args}: not found")
+        print(f"{args[0]}: not found")
 
 
-BUILTIN_COMMAND_HANDLER_MAP = {"echo": handle_echo, "type": handle_type}
+BUILTIN_COMMANDS = {"echo": handle_echo, "type": handle_type}
 
 
 def main():
     while True:
         sys.stdout.write("$ ")
-        user_input = input()
+        command = input()
         # handle exit
-        if user_input == "exit":
+        if command == "exit":
             break
         # handle builtins
-        user_input_split = user_input.split(" ", maxsplit=1)
-        if user_input_split[0] in BUILTIN_COMMAND_HANDLER_MAP:
-            handler = BUILTIN_COMMAND_HANDLER_MAP[user_input_split[0]]
-            handler(user_input_split[1])
+        command_split = command.split(" ")
+        if command_split[0] in BUILTIN_COMMANDS:
+            handler = BUILTIN_COMMANDS[command_split[0]]
+            handler(command_split[1:])
             continue
         # handle unknown command
         else:
-            print(f"{user_input}: command not found")
+            print(f"{command}: command not found")
 
 
 if __name__ == "__main__":
