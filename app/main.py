@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 
-def handle_echo(args: list[str] | None):
+def handle_echo(args: list[str] | None) -> None:
     # empty raw string from cmd would be None, which should be ok to print newline
     if args is None:
         print()
@@ -25,7 +25,7 @@ def check_executable_exists(command: str) -> tuple[bool, str]:
     return False, ""
 
 
-def handle_type(args: list[str]):
+def handle_type(args: list[str]) -> None:
     # currently will not handle multiple args or missing args, just assume the good case
     if args[0] in BUILTIN_COMMANDS or args[0] == "exit":
         print(f"{args[0]} is a shell builtin")
@@ -37,7 +37,11 @@ def handle_type(args: list[str]):
         print(f"{args[0]}: not found")
 
 
-BUILTIN_COMMANDS = {"echo": handle_echo, "type": handle_type}
+def handle_pwd(args: list[str]) -> None:
+    print(os.getcwd())
+
+
+BUILTIN_COMMANDS = {"echo": handle_echo, "type": handle_type, "pwd": handle_pwd}
 
 
 def main():
