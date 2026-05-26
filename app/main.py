@@ -1,4 +1,5 @@
 import os
+import shlex
 import subprocess
 import sys
 
@@ -61,7 +62,7 @@ def main():
         if command == "exit":
             break
 
-        command_split = command.split(" ")
+        command_split = shlex.split(command)
 
         # handle executable
         exe_exist, exe_path = check_executable_exists(command_split[0])
