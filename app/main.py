@@ -8,7 +8,7 @@ def handle_echo(args: list[str] | None):
     if args is None:
         print()
     else:
-        print(args)
+        print(" ".join(args))
 
 
 def check_executable_exists(command: str) -> tuple[bool, str]:
@@ -27,12 +27,12 @@ def check_executable_exists(command: str) -> tuple[bool, str]:
 
 def handle_type(args: list[str]):
     # currently will not handle multiple args or missing args, just assume the good case
-    if args in BUILTIN_COMMANDS or args == "exit":
-        print(f"{args} is a shell builtin")
+    if args[0] in BUILTIN_COMMANDS or args[0] == "exit":
+        print(f"{args[0]} is a shell builtin")
         return
-    exe_exist, full_path = check_executable_exists(args[0])
+    exe_exist, exe_path = check_executable_exists(args[0])
     if exe_exist:
-        print(f"{args[0]} is {full_path}")
+        print(f"{args[0]} is {exe_path}")
     else:
         print(f"{args[0]}: not found")
 
@@ -52,9 +52,11 @@ def main():
         command_split = command.split(" ")
 
         # handle executable
-        exe_exist, full_path = check_executable_exists(command_split[0])
+        exe_exist, exe_path = check_executable_exists(command_split[0])
         if exe_exist:
-            subprocess.run([full_path] + command_split[1:], check=True)
+            subprocess.run(
+                [os.path.basename(exe_path)] + command_split[1:], check=True
+            )  # avoid passing the full exe
             continue
 
         # handle builtins
@@ -64,7 +66,7 @@ def main():
             continue
         # handle unknown command
         else:
-            print(f"{command}: command not found")
+            print(f"{command_split[0]}: command not found")
 
 
 if __name__ == "__main__":
