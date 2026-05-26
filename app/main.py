@@ -19,7 +19,6 @@ def check_executable_exists(command: str) -> tuple[bool, str]:
             and os.access(executable_path, os.X_OK)
             and command == os.path.basename(executable_path)
         ):
-            print(f"Found executable: {executable_path}")
             return True, executable_path
         else:
             continue
