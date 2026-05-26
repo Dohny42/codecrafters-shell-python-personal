@@ -41,7 +41,15 @@ def handle_pwd(args: list[str]) -> None:
     print(os.getcwd())
 
 
-BUILTIN_COMMANDS = {"echo": handle_echo, "type": handle_type, "pwd": handle_pwd}
+def handle_cd(args: list[str]) -> None:
+    expanded_path = os.path.expanduser(args[0])
+    try:
+        os.chdir(expanded_path)
+    except FileNotFoundError:
+        print(f"cd: {expanded_path}: No such file or directory")
+
+
+BUILTIN_COMMANDS = {"echo": handle_echo, "type": handle_type, "pwd": handle_pwd, "cd": handle_cd}  #
 
 
 def main():
