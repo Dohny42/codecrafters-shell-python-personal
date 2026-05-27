@@ -58,7 +58,7 @@ def execute_command(command: str, command_args: list[str], output_target: TextIO
         subprocess.run(
             [os.path.basename(exe_path)] + command_args,
             stdout=output_target,
-            stderr=output_target,
+            # stderr=output_target,
         )
         return
 
