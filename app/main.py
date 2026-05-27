@@ -80,6 +80,7 @@ def handle_redirection(redirection_op: str | None, file: str | None) -> TextIO:
 
 
 BUILTIN_COMMANDS = {"echo": handle_echo, "type": handle_type, "pwd": handle_pwd, "cd": handle_cd}
+REDIRECTION_OPERATORS = {">", ">>", "1>", "1>>", "!>", "!>>", "2>", "2>>"}
 
 
 def main():
@@ -98,9 +99,14 @@ def main():
         redirection_op = None
         file = None
         if len(command_split) >= 3:
-            redirection_op = command_split[-2]
-            file = command_split[-1]
-            command_args = command_split[1:-2]
+            # possible redirection, check the last two tokens
+            # TODO: stdout/stderr chain redirection, e.g. cmd > out.txt 2>&1
+            if command_split[-2] in REDIRECTION_OPERATORS:
+                redirection_op = command_split[-2]
+                file = command_split[-1]
+                command_args = command_split[1:-2]
+            else:
+                command_args = command_split[1:]
         else:
             command_args = command_split[1:]
 

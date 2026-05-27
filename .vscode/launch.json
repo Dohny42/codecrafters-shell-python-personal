@@ -1,0 +1,20 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Main",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${cwd}/app/main.py",
+      "console": "integratedTerminal",
+      "args": [
+        "/tmp/fox/\"number 39\"",
+        "/tmp/fox/\"doublequote \\\" 92\"",
+        "/tmp/fox/\"backslash \\\\ 34\""
+      ]
+    }
+  ]
+}
