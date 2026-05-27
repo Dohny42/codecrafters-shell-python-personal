@@ -94,11 +94,16 @@ def main():
 
         command_split = shlex.split(command)
         command = command_split[0]
-        command_args = command_split[1:-2]
-        redirection_op = command_split[
-            -2
-        ]  # TODO: we can have both stdout/stderr redirections : cmd > out.txt 2> err.txt
-        file = command_split[-1]
+
+        # Check if there's redirection
+        redirection_op = None
+        file = None
+        if len(command_split) >= 3:
+            redirection_op = command_split[-2]
+            file = command_split[-1]
+            command_args = command_split[1:-2]
+        else:
+            command_args = command_split[1:]
 
         output_target = handle_redirection(redirection_op, file)
 
