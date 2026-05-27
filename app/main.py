@@ -1,38 +1,15 @@
-import os
 import shlex
-import subprocess
 import sys
-from typing import TextIO
 
-from app.core.builtins_cmd import BUILTIN_COMMANDS, check_executable_exists
 from app.core.cli import handle_redirection, parse_redirection_cli, setup_autocompletion
-
-
-def execute_command(
-    command: str, command_args: list[str], stdout_target: TextIO, stderr_target: TextIO
-) -> None:
-    # handle executable
-    exe_exist, exe_path = check_executable_exists(command)
-    if exe_exist:
-        subprocess.run(
-            [os.path.basename(exe_path)] + command_args,
-            stdout=stdout_target,
-            stderr=stderr_target,
-        )
-        return
-
-    # handle builtins
-    if command in BUILTIN_COMMANDS:
-        handler = BUILTIN_COMMANDS[command]
-        handler(command_args, stdout_target, stderr_target)
-        return
-    # handle unknown command
-    else:
-        print(f"{command}: command not found", file=stderr_target)
+from app.core.exec_cache import get_exec_cache
+from app.core.execute import execute_command
 
 
 def main():
-    setup_autocompletion()
+    exec_cache = get_exec_cache()
+
+    setup_autocompletion(exec_cache)
 
     while True:
         sys.stdout.write("$ ")
@@ -49,7 +26,7 @@ def main():
             stdout_op, stdout_file, stderr_op, stderr_file
         )
 
-        execute_command(command, command_args, stdout_target, stderr_target)
+        execute_command(command, command_args, stdout_target, stderr_target, exec_cache)
 
         if stdout_target is not sys.stdout:
             stdout_target.close()

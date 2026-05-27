@@ -1,56 +1,55 @@
 import os
 import sys
+from dataclasses import dataclass
 from typing import TextIO
 
+from app.core.exec_cache import check_executable_exists
 
-def handle_exit(args: list[str], stdout: TextIO, stderr: TextIO) -> None:
+
+@dataclass(frozen=True)
+class ShellContext:
+    stdout_target: TextIO
+    stderr_target: TextIO
+    exec_cache: dict[str, str]
+
+
+def handle_exit(args: list[str], context: ShellContext) -> None:
     sys.exit(0)
 
 
-def handle_echo(args: list[str] | None, stdout: TextIO, stderr: TextIO) -> None:
+def handle_echo(args: list[str] | None, context: ShellContext) -> None:
     # empty raw string from cmd would be None, which should be ok to print newline
     if args is None:
-        print(file=stdout)
+        print(file=context.stdout_target)
     else:
-        print(" ".join(args), file=stdout)
+        print(" ".join(args), file=context.stdout_target)
 
 
-def check_executable_exists(command: str) -> tuple[bool, str]:
-    for path in os.getenv("PATH", "").split(os.pathsep):
-        executable_path = os.path.join(path, command)
-        if (
-            os.path.isfile(executable_path)
-            and os.access(executable_path, os.X_OK)
-            and command == os.path.basename(executable_path)
-        ):
-            return True, executable_path
-        else:
-            continue
-    return False, ""
-
-
-def handle_type(args: list[str], stdout: TextIO, stderr: TextIO) -> None:
+def handle_type(args: list[str], context: ShellContext) -> None:
     # currently will not handle multiple args or missing args, just assume the good case
     if args[0] in BUILTIN_COMMANDS or args[0] == "exit":
-        print(f"{args[0]} is a shell builtin", file=stdout)
+        print(f"{args[0]} is a shell builtin", file=context.stdout_target)
         return
-    exe_exist, exe_path = check_executable_exists(args[0])
+    exe_exist, exe_path = check_executable_exists(
+        args[0],
+        context.exec_cache,
+    )
     if exe_exist:
-        print(f"{args[0]} is {exe_path}", file=stdout)
+        print(f"{args[0]} is {exe_path}", file=context.stdout_target)
     else:
-        print(f"{args[0]}: not found", file=stderr)
+        print(f"{args[0]}: not found", file=context.stderr_target)
 
 
-def handle_pwd(args: list[str], stdout: TextIO, stderr: TextIO) -> None:
-    print(os.getcwd(), file=stdout)
+def handle_pwd(args: list[str], context: ShellContext) -> None:
+    print(os.getcwd(), file=context.stdout_target)
 
 
-def handle_cd(args: list[str], stdout: TextIO, stderr: TextIO) -> None:
+def handle_cd(args: list[str], context: ShellContext) -> None:
     expanded_path = os.path.expanduser(args[0])
     try:
         os.chdir(expanded_path)
     except FileNotFoundError:
-        print(f"cd: {expanded_path}: No such file or directory", file=stderr)
+        print(f"cd: {expanded_path}: No such file or directory", file=context.stderr_target)
 
 
 BUILTIN_COMMANDS = {

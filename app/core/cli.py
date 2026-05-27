@@ -58,21 +58,26 @@ def handle_redirection(
     return stdout_target, stderr_target
 
 
-def autocomplete(text: str, state: int) -> str | None:
-    options = [cmd for cmd in BUILTIN_COMMANDS.keys() if cmd.startswith(text)]
-    if state < len(options):
-        return options[state] + " "
-    else:
-        return None
+def make_autocomplete(exec_cache: dict[str, str]):
+    def autocomplete(text: str, state: int) -> str | None:
+        options = [cmd for cmd in BUILTIN_COMMANDS.keys() if cmd.startswith(text)]
+        options += [cmd for cmd in exec_cache.keys() if cmd.startswith(text)]
+        options = sorted(set(options))  # remove duplicates and sort
+        if state < len(options):
+            return options[state] + " "
+        else:
+            return None
+
+    return autocomplete
 
 
-def setup_autocompletion():
-    readline.set_completer(autocomplete)  # type: ignore (windows)
+def setup_autocompletion(exec_cache: dict[str, str]):
+    readline.set_completer(make_autocomplete(exec_cache))  # type: ignore (windows)
     readline.parse_and_bind("tab: complete")  # type: ignore (windows)
 
 
 if __name__ == "__main__":
-    setup_autocompletion()
+    setup_autocompletion({})
 
     while True:
         input_cmd = input("shell> ")
