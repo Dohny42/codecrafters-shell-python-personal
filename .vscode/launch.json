@@ -8,13 +8,8 @@
       "name": "Main",
       "type": "debugpy",
       "request": "launch",
-      "program": "${cwd}/app/main.py",
-      "console": "integratedTerminal",
-      "args": [
-        "/tmp/fox/\"number 39\"",
-        "/tmp/fox/\"doublequote \\\" 92\"",
-        "/tmp/fox/\"backslash \\\\ 34\""
-      ]
+      "module": "app.main",
+      "console": "integratedTerminal"
     }
   ]
 }
