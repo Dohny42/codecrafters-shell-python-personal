@@ -59,21 +59,43 @@ def handle_redirection(
 
 
 def make_autocomplete(exec_cache: dict[str, str]):
+    last_prefix = ""
+    tab_count = 0
+
     def autocomplete(text: str, state: int) -> str | None:
-        options = [cmd for cmd in BUILTIN_COMMANDS.keys() if cmd.startswith(text)]
-        options += [cmd for cmd in exec_cache.keys() if cmd.startswith(text)]
-        options = sorted(set(options))  # remove duplicates and sort
-        if state < len(options):
-            return options[state] + " "
-        else:
-            return None
+        nonlocal last_prefix, tab_count
+        matches = [cmd for cmd in BUILTIN_COMMANDS.keys() if cmd.startswith(text)]
+        matches += [cmd for cmd in exec_cache.keys() if cmd.startswith(text)]
+        matches = sorted(set(matches))  # remove duplicates and sort
+
+        if text != last_prefix:
+            last_prefix = text
+            tab_count = 0
+
+        if state == 0:
+            tab_count += 1
+            if len(matches) > 1:
+                if tab_count == 1:
+                    print("\a", end="", flush=True)
+                elif tab_count == 2:
+                    print("\n" + " ".join(matches))
+                    print(f"$ {readline.get_line_buffer()}", end="", flush=True)  # type: ignore (windows)
+        if state < len(matches):
+            return matches[state] + " "
+        return None
 
     return autocomplete
+
+
+def display_matches(substitution, matches, longest_match_length):
+    print("\n" + " ".join(matches))
+    print(f"$ {readline.get_line_buffer()}", end="", flush=True)  # type: ignore (windows)
 
 
 def setup_autocompletion(exec_cache: dict[str, str]):
     readline.set_completer(make_autocomplete(exec_cache))  # type: ignore (windows)
     readline.parse_and_bind("tab: complete")  # type: ignore (windows)
+    readline.set_completion_display_matches_hook(display_matches)  # type: ignore (windows)
 
 
 if __name__ == "__main__":

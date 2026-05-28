@@ -16,6 +16,8 @@ def main():
         command = input()
 
         command_split = shlex.split(command)
+        if not command_split:
+            continue
         command = command_split[0]
 
         command_args, stdout_op, stdout_file, stderr_op, stderr_file = parse_redirection_cli(
